@@ -26,6 +26,7 @@ import { ClubItem, joinClub, leaveClub, clubQuota } from '../club/club';
 import { useShake } from '../animation/animation';
 import { useSignedInUser } from '../events/signed-in-user';
 import { showPointOfSale } from './modal/point-of-sale-modal';
+import { useAppTheme } from '../app-theme/app-theme';
 
 const SelectedClub = ({
   clubItem,
@@ -34,6 +35,8 @@ const SelectedClub = ({
   clubItem: ClubItem
   onPress?: (clubItem: ClubItem) => any
 }) => {
+  const { appThemeName } = useAppTheme();
+
   return (
     <Pressable
       style={{
@@ -41,16 +44,21 @@ const SelectedClub = ({
         alignItems: 'center',
         flexShrink: 1,
       }}
+      disabled={!onPress}
       onPress={onPress && (() => onPress(clubItem))}
     >
       <Basic
         style={{
-          backgroundColor: 'rgba(119, 0, 255, 0.1)',
+          backgroundColor: appThemeName === 'dark'
+            ? 'rgba(119, 0, 255, 1.0)'
+            : 'rgba(119, 0, 255, 0.1)',
           flexShrink: 1,
           borderBottomWidth: 3,
         }}
         textStyle={{
-          color: '#70f',
+          color: appThemeName === 'dark'
+            ? '#ffffff'
+            : '#7700ff',
         }}
       >
         {clubItem.name}
@@ -151,6 +159,7 @@ const fetchClubItems = async (q: string): Promise<ClubItem[]> => {
 };
 
 const ClubSelector = ({navigation}) => {
+  const { appTheme } = useAppTheme();
   const [selectedClubs, setSelectedClubs] = useState(
     lastEvent<ClubItem[]>('updated-clubs') ?? []
   );
@@ -222,6 +231,8 @@ const ClubSelector = ({navigation}) => {
           <Ionicons
             style={{
               fontSize: 20,
+              color: appTheme.secondaryColor,
+              marginBottom: 10,
             }}
             name="arrow-back"
           />
@@ -231,9 +242,9 @@ const ClubSelector = ({navigation}) => {
           style={{
             marginLeft: 50,
             marginRight: 50,
-            borderRadius: 0,
             borderWidth: 0,
             height: '100%',
+            marginBottom: 10,
           }}
           value={searchText}
           onChangeText={onChangeTextDebounced}
@@ -257,6 +268,8 @@ const ClubSelector = ({navigation}) => {
             <Ionicons
               style={{
                 fontSize: 20,
+                color: appTheme.secondaryColor,
+                marginBottom: 10,
               }}
               name="close"
             />
@@ -316,7 +329,7 @@ const ClubSelector = ({navigation}) => {
               flexGrow: 1,
             }}
           >
-            <ActivityIndicator size="large" color="#70f"/>
+            <ActivityIndicator size="large" color={appTheme.brandColor}/>
           </View>
         }
         {!isLoading && searchText !== "" && _.isEmpty(filteredSearchResults) &&
@@ -344,7 +357,7 @@ const ClubSelector = ({navigation}) => {
             )}
             <DefaultText style={{
               fontFamily: 'TruenoBold',
-              color: '#000',
+              color: appTheme.secondaryColor,
               fontSize: 16,
               textAlign: 'center',
               alignSelf: 'center',
